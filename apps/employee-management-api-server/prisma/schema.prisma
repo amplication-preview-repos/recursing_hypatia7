@@ -1,0 +1,91 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Presence {
+  id                 String              @id @default(cuid())
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  dateTimeOfPresence DateTime?
+  status             EnumPresenceStatus?
+  hours              Int?
+  employee           Employee?           @relation(fields: [employeeId], references: [id])
+  employeeId         String?
+}
+
+model Employee {
+  id                  String               @id @default(cuid())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  name                String?
+  email               String?
+  phoneNumber         String?
+  presences           Presence[]
+  transfers           Transfer[]
+  holidays            Holiday[]
+  permissions         Permission[]
+  diseaseCertificates DiseaseCertificate[]
+}
+
+model Permission {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  startDate  DateTime?
+  endDate    DateTime?
+  reason     String?
+  employee   Employee? @relation(fields: [employeeId], references: [id])
+  employeeId String?
+}
+
+model Holiday {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  startDate  DateTime?
+  endDate    DateTime?
+  employee   Employee? @relation(fields: [employeeId], references: [id])
+  employeeId String?
+}
+
+model Transfer {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  toCity       String?
+  transferDate DateTime?
+  employee     Employee? @relation(fields: [employeeId], references: [id])
+  employeeId   String?
+}
+
+model DiseaseCertificate {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  expiryDate DateTime?
+  file       Json?
+  issueDate  DateTime?
+  employee   Employee? @relation(fields: [employeeId], references: [id])
+  employeeId String?
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName String?
+  lastName  String?
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  roles     Json
+}
+
+enum EnumPresenceStatus {
+  Option1
+}
